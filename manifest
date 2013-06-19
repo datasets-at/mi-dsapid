@@ -1,0 +1,7 @@
+name="dsapid"
+organization="SmartOS"
+brand="SmartMachine"
+version="0.1.3"
+description="A dataset server that mirrors one or more remote dataset servers"
+homepage="http://datasets.at/"
+users="root admin"
