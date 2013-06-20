@@ -1,0 +1,3 @@
+[submodule "copy/opt/dsapi"]
+	path = copy/opt/dsapi
+	url = git://github.com/MerlinDMC/smartos-public-dsapi.git
