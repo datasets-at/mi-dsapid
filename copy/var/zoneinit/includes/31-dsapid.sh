@@ -1,71 +1,82 @@
 
-log "creating /database directory and setting permissions"
+log "creating /data directory"
 
-if [[ ! -e /database ]]; then
-  mkdir /database
+if [[ ! -e /data ]]; then
+  mkdir /data
+  mkdir /data/files
 fi
 
-chown -R couchdb:couchdb /database
+if [[ ! -e /data/config.json ]]; then
+  log "creating initial configuration"
 
-log "starting couchdb instance"
-
-/usr/sbin/svcadm enable epmd:default
-/usr/sbin/svcadm enable couchdb:default
-
-log "waiting for couchdb"
-
-COUCHDB_TIMEOUT=60
-while [[ ! $(netstat -an | grep 127.0.0.1.5984) ]]; do
-  : ${MYCOUNT:=0}
-  sleep 1
-  ((MYCOUNT=MYCOUNT+1))
-  if [[ $MYCOUNT -eq $COUCHDB_TIMEOUT ]]; then
-    log "ERROR Could not talk to CouchDB after ${COUCHDB_TIMEOUT} seconds"
-    ERROR=yes
-    break 1
-  fi
-done
-[[ -n "${ERROR}" ]] && exit 31
-
-log "(it took ${MYCOUNT} seconds to start properly)"
-
-sleep 1
-
-[[ "$(svcs -Ho state couchdb:default)" == "online" ]] || \
-  ( log "ERROR CouchDB SMF not reporting as 'online'" && exit 31 )
-
-log "adding ui"
-
-DSAPI_INSTALL_UI=$(mdata-get dsapi_install_ui 2>/dev/null) || DSAPI_INSTALL_UI="false"
-
-if [[ "${DSAPI_INSTALL_UI}" == "true" ]]; then
-  /opt/local/gnu/bin/tar -xjf /var/zoneinit/dsapi-ui.tar.bz2 -C /opt/dsapi-ui
+  cat > /data/config.json << EOF
+{
+  "hostname": "${HOSTNAME}",
+  "base_url": "http://${HOSTNAME}/",
+  "datadir": "/data/files",
+  "mount_ui": "/opt/dsapid/ui",
+  "users": "/data/users.json",
+  "listen": {
+    "http": {
+      "address": "0.0.0.0:80",
+      "ssl": false
+    }
+  },
+  "sync": [
+    {
+      "name": "official joyent dsapi",
+      "active": false,
+      "type": "dsapi",
+      "provider": "joyent",
+      "source": "https://datasets.joyent.com/datasets",
+      "delay": "24h"
+    },
+    {
+      "name": "official joyent imgapi",
+      "active": false,
+      "type": "imgapi",
+      "provider": "joyent",
+      "source": "https://images.joyent.com/images",
+      "delay": "24h"
+    }
+  ]
+}
+EOF
 fi
 
-log "adding default sync source"
+if [[ ! -e /data/users.json ]]; then
+  log "creating initial users list and seed it with joyent uuids"
 
-DSAPI_SOURCE_NAME=$(mdata-get dsapi_source_name 2>/dev/null) || DSAPI_SOURCE_NAME="joyent"
-DSAPI_SOURCE_URL=$(mdata-get dsapi_source_url 2>/dev/null) || DSAPI_SOURCE_URL="https://datasets.joyent.com/datasets"
-DSAPI_SOURCE_TYPE=$(mdata-get dsapi_source_type 2>/dev/null) || DSAPI_SOURCE_TYPE="manifest"
-
-if [[ "${DSAPI_SOURCE_TYPE}" == "manifest" ]]; then
-  /opt/dsapi/bin/add-sync-source "${DSAPI_SOURCE_NAME}" "${DSAPI_SOURCE_URL}"
-elif [[ "${DSAPI_SOURCE_TYPE}" == "deep" ]]; then
-  /opt/dsapi/bin/add-sync-source "${DSAPI_SOURCE_NAME}" "${DSAPI_SOURCE_URL}" -f
+  cat > /data/users.json << EOF
+[
+  {
+    "uuid": "352971aa-31ba-496c-9ade-a379feaecd52",
+    "name": "sdc",
+    "type": "system",
+    "provider": "joyent"
+  },
+  {
+    "uuid": "684f7f60-5b38-11e2-8eae-6b88dd42e590",
+    "name": "sdc",
+    "type": "system",
+    "provider": "joyent"
+  },
+  {
+    "uuid": "a979f956-12cb-4216-bf4c-ae73e6f14dde",
+    "name": "sdc",
+    "type": "system",
+    "provider": "joyent"
+  },
+  {
+    "uuid": "9dce1460-0c4c-4417-ab8b-25ca478c5a78",
+    "name": "jpc",
+    "type": "system",
+    "provider": "joyent"
+  }
+]
+EOF
 fi
 
-log "syncing manifests"
+log "starting dsapid"
 
-/opt/dsapi/sbin/dsapi-sync-manifests
-
-log "adding dsapid instance"
-
-svccfg import /opt/dsapi/smf/dsapid.xml
-
-log "starting dsapid instance"
-
-/usr/sbin/svcadm enable dsapid:default
-
-log "starting nginx proxy"
-
-/usr/sbin/svcadm enable nginx:default
+/usr/sbin/svcadm enable dsapid

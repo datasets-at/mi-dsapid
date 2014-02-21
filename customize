@@ -5,25 +5,42 @@ PATH=/opt/local/gnu/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin
 # Exit if any commands fail
 set -o errexit
 
-# Ensure we have updated standard packages
-echo "* Updating standard packages.";
-touch /opt/local/.dlj_license_accepted
-
 # Configuring image specific packages
 echo "* Configuring image specific packages.";
-
-cat << EOF >> /var/spool/cron/crontabs/root
-#
-# dsapid sync manifests and files
-#
-0 * * * * /opt/dsapi/sbin/dsapi-sync-files
-0 * * * * /opt/dsapi/sbin/dsapi-sync-manifests
-EOF
+svccfg import /root/dsapid.xml
 
 # Clean up
 echo "* Cleaning up."
+pkgin clean
 rm -rf /root/*
-rm -rf /opt/dsapi/.git
+
+/usr/bin/rm -rf /opt/local
+/usr/bin/curl -k http://pkgsrc.joyent.com/packages/SmartOS/bootstrap/bootstrap-2013Q3-i386.tar.gz | /usr/bin/gzcat | /usr/bin/tar -xf - -C /
+
+pkg_add http://pkgsrc.joyent.com/packages/SmartOS/2013Q3/i386/All/smtools-20140129.tgz
+pkg_add http://pkgsrc.joyent.com/packages/SmartOS/2013Q3/i386/All/zoneinit-1.6.7.tgz
+pkg_add http://pkgsrc.joyent.com/packages/SmartOS/2013Q3/i386/All/rsyslog-7.4.7.tgz
+
+cat > /opt/local/etc/rsyslog.conf << EOF
+#
+# Sample rsyslog configuration file
+#
+
+$ModLoad immark
+$ModLoad imsolaris
+# $ModLoad imtcp
+# $ModLoad imudp
+
+*.err;kern.notice;auth.notice                   /dev/sysmsg
+*.err;kern.debug;daemon.notice;mail.crit        /var/adm/messages
+*.alert;kern.err;daemon.err                     :omusrmsg:operator
+*.alert                                         :omusrmsg:root
+*.emerg                                         :omusrmsg:*
+
+mail.debug                                      /var/log/syslog
+mail.info                                       /var/log/maillog
+auth.info                                       /var/log/authlog
+EOF
 
 # Prepare image for provisioning
 sm-prepare-image -y

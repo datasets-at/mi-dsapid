@@ -1,1 +1,12 @@
+0.6.3: first public release (the real one)
+- logging restructured
+- config for listener addresses rewritten
+- unofficial "homepage" property for dsapi manifests
+
+0.6.0: next level
+- rewrote backend in [Go](http://golang.org/)
+- serving dsapi and imgapi
+- mirroring dsapi and imgapi
+- all local storage (no database anymore)
+
 0.1.3: First try on mibe
