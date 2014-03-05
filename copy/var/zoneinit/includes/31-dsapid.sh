@@ -11,17 +11,17 @@ if [[ ! -e /data/config.json ]]; then
 
   cat > /data/config.json << EOF
 {
-  "hostname": "${HOSTNAME}",
+  "log_level": "info",
   "base_url": "http://${HOSTNAME}/",
-  "datadir": "/data/files",
   "mount_ui": "/opt/dsapid/ui",
-  "users": "/data/users.json",
   "listen": {
     "http": {
       "address": "0.0.0.0:80",
       "ssl": false
     }
   },
+  "datadir": "/data/files",
+  "users": "/data/users.json",
   "sync": [
     {
       "name": "official joyent dsapi",

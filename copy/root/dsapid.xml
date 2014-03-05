@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
 <service_bundle type='manifest' name='export'>
-  <service name='application/dsapid' type='service' version='61'>
+  <service name='application/dsapid' type='service' version='65'>
     <create_default_instance enabled='false'/>
     <single_instance/>
     <dependency name='network' grouping='require_all' restart_on='error' type='service'>
@@ -16,7 +16,7 @@
         <envvar name='PATH' value='/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin:/bin'/>
       </method_environment>
     </method_context>
-    <exec_method name='start' type='method' exec='/opt/dsapid/server -config=/data/config.json -log_level=info' timeout_seconds='60'>
+    <exec_method name='start' type='method' exec='/opt/dsapid/server -config=/data/config.json' timeout_seconds='60'>
       <method_context>
         <method_environment>
           <envvar name='PATH' value='/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin'/>
