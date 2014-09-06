@@ -1,3 +1,10 @@
+0.6.6: security updates and user management
+- switched to the latest base image (14.2.0)
+- libraries updated
+- easier user management through the API
+- fixed a bug that allowed an uploader to change files outside of the image storage directory
+- dsapid will now run with own user rights not as root anymore
+
 0.6.3: first public release (the real one)
 - logging restructured
 - config for listener addresses rewritten

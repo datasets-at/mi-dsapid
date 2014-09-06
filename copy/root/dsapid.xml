@@ -10,8 +10,8 @@
     <dependency name='filesystem' grouping='require_all' restart_on='error' type='service'>
       <service_fmri value='svc:/system/filesystem/local'/>
     </dependency>
-    <method_context working_directory='/opt/dsapid'>
-      <method_credential group='root' user='root'/>
+    <method_context project="dsapid" working_directory='/opt/dsapid'>
+      <method_credential group='dsapid' user='dsapid' privileges='basic,net_privaddr'/>
       <method_environment>
         <envvar name='PATH' value='/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin:/bin'/>
       </method_environment>

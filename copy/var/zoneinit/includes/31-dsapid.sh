@@ -85,6 +85,10 @@ if [[ ! -e /data/users.json ]]; then
 EOF
 fi
 
+log "force correct ownership of /data directory"
+
+chown -R dsapid:dsapid /data
+
 log "starting dsapid"
 
 /usr/sbin/svcadm enable dsapid

@@ -7,6 +7,16 @@ set -o errexit
 
 # Configuring image specific packages
 echo "* Configuring image specific packages.";
+
+/usr/sbin/groupadd -g 5092 dsapid
+/usr/sbin/useradd -u 5092 -g dsapid -d /opt/dsapid -s /usr/bin/bash dsapid
+
+if ! projects -l dsapid >/dev/null 2>&1; then
+  LANG=C projadd -U dsapid -G dsapid \
+    -K "process.max-file-descriptor=(basic,16384,deny)" \
+    -c "Dataset Image Server" dsapid
+fi
+
 svccfg import /root/dsapid.xml
 
 # Clean up
@@ -15,11 +25,11 @@ pkgin clean
 rm -rf /root/*
 
 /usr/bin/rm -rf /opt/local
-/usr/bin/curl -k http://pkgsrc.joyent.com/packages/SmartOS/bootstrap/bootstrap-2013Q3-i386.tar.gz | /usr/bin/gzcat | /usr/bin/tar -xf - -C /
+/usr/bin/curl -k http://pkgsrc.joyent.com/packages/SmartOS/bootstrap/bootstrap-2014Q2-i386.tar.gz | /usr/bin/gzcat | /usr/bin/tar -xf - -C /
 
-pkg_add http://pkgsrc.joyent.com/packages/SmartOS/2013Q3/i386/All/smtools-20140129.tgz
-pkg_add http://pkgsrc.joyent.com/packages/SmartOS/2013Q3/i386/All/zoneinit-1.6.7.tgz
-pkg_add http://pkgsrc.joyent.com/packages/SmartOS/2013Q3/i386/All/rsyslog-7.4.7.tgz
+pkg_add http://pkgsrc.joyent.com/packages/SmartOS/2014Q2/i386/All/smtools-20140829.tgz
+pkg_add http://pkgsrc.joyent.com/packages/SmartOS/2014Q2/i386/All/zoneinit-1.6.8.tgz
+pkg_add http://pkgsrc.joyent.com/packages/SmartOS/2014Q2/i386/All/rsyslog-8.2.2nb3.tgz
 
 cat > /opt/local/etc/rsyslog.conf << EOF
 #

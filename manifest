@@ -1,7 +1,7 @@
 name="dsapid"
 organization="SmartOS"
 brand="SmartMachine"
-version="0.6.3"
+version="0.6.6"
 description="A dataset server that mirrors one or more remote dataset servers"
 homepage="https://github.com/datasets-at/mi-dsapid"
 users="root admin"
