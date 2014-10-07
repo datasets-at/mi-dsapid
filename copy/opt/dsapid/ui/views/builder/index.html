@@ -12,6 +12,8 @@
 		<dd>{{dataset.description}}</dd>
 		<dt>Published:</dt>
 		<dd date-from-now="dataset.published_at">{{dataset.published_at}}</dd>
+		<dt>Download-Size:</dt>
+		<dd>{{dataset.getDownloadSize()}}</dd>
 		<dt ng-show="dataset.stats_info['downloaded']">Snatched:</dt>
 		<dd ng-show="dataset.stats_info['downloaded']">{{dataset.stats_info['downloaded']}} times</dd>
 		<dt ng-show="dataset.homepage">Homepage:</dt>
@@ -48,7 +50,7 @@
 			</div>
 		</div>
 
-		<div ng-show="isJoyent()">
+		<div ng-show="isJoyent() || isLX()">
 			<!-- joyent / ram -->
 			<div class="form-group">
 				<label class="col-sm-3 col-md-2 control-label" for="ds-memory">Memory</label>
@@ -83,7 +85,7 @@
 		</div>
 
 		<div id="sub-settings-extended" class="collapse">
-			<div ng-show="isJoyent()">
+			<div ng-show="isJoyent() || isLX()">
 				<!-- joyent / swap + tmpfs + quota -->
 				<div class="form-group">
 					<label class="col-sm-3 col-md-2 control-label" for="ds-swap">Swap</label>
@@ -170,6 +172,18 @@
 					</label>
 					<label class="radio-inline">
 						<input type="radio" name="ds-autoboot" ng-value="false" ng-model="form.settings.autoboot"> No
+					</label>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 col-md-2 control-label">Delegate Dataset</label>
+				<div class="col-sm-5 col-md-6">
+					<label class="radio-inline">
+						<input type="radio" name="ds-delegate_dataset" ng-value="true" ng-model="form.settings.delegate_dataset"> Yes
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="ds-delegate_dataset" ng-value="false" ng-model="form.settings.delegate_dataset"> No
 					</label>
 				</div>
 			</div>

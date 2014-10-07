@@ -1,3 +1,7 @@
+0.6.7: bugfix release
+- BUGFIX: syncing from the /api/datasets route should sync manifest options
+- sync for LX brand images
+
 0.6.6: security updates and user management
 - switched to the latest base image (14.2.0)
 - libraries updated
